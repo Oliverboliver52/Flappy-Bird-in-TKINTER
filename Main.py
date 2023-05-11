@@ -36,6 +36,8 @@ class Game:
 	def Jump(self,event):
 		self.jumpSpeed = -4 # Jump event
 		#print('jump speed = '+str(self.jumpSpeed)) #Debuging
+	def getCanvas(self):
+		return self.gameCanvas
 	def UpdateSelf(self):
 		if self.running == False:
 			return 1
@@ -88,5 +90,5 @@ game = Game()
 while 1:
   if game.UpdateSelf():
     break
-  canvas.update()
+  game.getCanvas().update()
   time.sleep(0.01)
