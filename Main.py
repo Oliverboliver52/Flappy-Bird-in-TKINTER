@@ -7,8 +7,26 @@ import os
 
 class Game:
 	def __init__(self):
+		#Bools
+		self.isInitilised = False
 		#Init
-		
+		self.gameRoot = tk.Tk() # Game window
+		self.gameRoot.geometry('450x450') # Initialising Window
+		#Canvas
+		self.gameCanvas = tk.Canvas(self.gameRoot, width=450,height=450,bg='blue')
+		self.gameCanvas.pack()
+		#Start Screen
+		self.startScreen = [
+			self.gameCanvas.create_rectangle(0,0,450,450,fill="white"),
+			self.gameCanvas.create_text(450/2,450/2,text="Flappy Bird, By Oliver", font=('Helvetica 30 bold'),fill="black"),
+			self.gameCanvas.create_rectangle(10,10,60,60,fill="yellow"),
+			self.gameCanvas.create_text(450/2,450/1.5,text="Space to start",font=('Helvetica 15 bold'),fill='black')
+		]
+		self.gameRoot.bind('<space>', self.Jump)
+	def initialise(self):
+		for i in self.startScreen:
+			self.gameCanvas.delete(i)
+		self.isInitilised = True
 		#Integers/floats
 		self.score = 0 # Score
 		self.speed = 4 # Speed
@@ -16,31 +34,34 @@ class Game:
 		self.jumpSpeed = 0 # The Vertical Speed
 		self.mass = 1 # Default = 1, gravity multiplier
 		self.trueScore = self.score # Increments in 0.5
-		self.gameRoot = tk.Tk() # Game window
-		self.gameRoot.geometry('450x450') # Initialising Window
+		
 		
 		#Canvas
-		
-		self.gameCanvas = tk.Canvas(self.gameRoot, width=450,height=450,bg='blue')
-		self.gameCanvas.pack()
 		
 		#Tkinter Elements
 		self.shape = [self.gameCanvas.create_rectangle(10,10,60,60,fill='yellow')]
 		self.scoreText = self.gameCanvas.create_text(450/2,15,text=str(self.score),fill="white",font=('Helvetica 30 bold'))
-		self.gameRoot.bind('<space>', self.Jump)
+		#self.gameRoot.bind('<space>', self.Jump)
 		self.pipes = []
 
 		self.running = True # Always starts as True
+	def KeyHandle(self,event):
+		
+		if self.isInitilised == False and event.char == ' ':
+			self.initialise()
 	def gravity(self):
 		self.jumpSpeed -= 0.1 * self.mass *-1.5 # doesn't return
 	def Jump(self,event):
+		if self.isInitilised == False:
+			#print('Init')
+			self.initialise()
+			return 0
 		self.jumpSpeed = -4 # Jump event
+		
 		#print('jump speed = '+str(self.jumpSpeed)) #Debuging
 	def getCanvas(self):
 		return self.gameCanvas
 	def UpdateSelf(self):
-		if self.running == False:
-			return 1
 		self.gravity() # Does Gravity
 		
 		for i in self.shape: # Moves the shape
@@ -86,9 +107,12 @@ class Game:
 		self.speed = 0 # Stops movement
 		showinfo(message='Hello, thanks for trying my game, hope you enjoyed.',title='You died') # Shows this message
 		self.gameRoot.destroy() # Destroys the window
+	def isInit(self):
+		return self.isInitilised
 game = Game()
 while 1:
-  if game.UpdateSelf():
-    break
   game.getCanvas().update()
+  if game.isInit() == False:
+	  continue
+  game.UpdateSelf()
   time.sleep(0.01)
